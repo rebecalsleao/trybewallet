@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { walletAction } from '../redux/actions';
+import { walletAction, expenseAction } from '../redux/actions';
 
 class WalletForm extends Component {
   state = {
@@ -18,13 +18,27 @@ class WalletForm extends Component {
   }
 
   requestWalletAPI = async () => {
-    const response = await fetch('https://economia.awesomeapi.com.br/json/all');
-    const data = await response.json();
-    const arrayKey = Object.keys(data);
-    const getCurrencies = arrayKey.filter((key) => key !== 'USDT');
+    // const response = await fetch('https://economia.awesomeapi.com.br/json/all');
+    // const data = await response.json();
+    // const arrayKey = Object.keys(data);
+    // const getCurrencies = arrayKey.filter((key) => key !== 'USDT');
+    const { dispatch } = this.props;
+    const arrayKey = await this.fetchAPI();
+    const getCurrencies = Object.keys(arrayKey);
+
+    dispatch(walletAction(getCurrencies));
     this.setState({
       currencies: getCurrencies,
-    }, this.handleChangeButton);
+    // }, this.handleChangeButton);
+    });
+  };
+
+  fetchAPI = async () => {
+    const res = await fetch('https://economia.awesomeapi.com.br/json/all');
+    const resJson = await res.json();
+    // console.log(resJson);
+    delete resJson.USDT;
+    return resJson;
   };
 
   handleChange = ({ target }) => {
@@ -34,10 +48,30 @@ class WalletForm extends Component {
     });
   };
 
-  handleChangeButton = () => {
-    const { dispatch } = this.props;
-    const { currencies } = this.state;
-    dispatch(walletAction(currencies));
+  handleChangeButton = async () => {
+    const { dispatch, expenses } = this.props;
+    const { value, description, currency, method, tag } = this.state;
+    const exchangeRates = await this.fetchAPI();
+
+    const expensesObj = {
+      id: expenses.length,
+      value,
+      description,
+      currency,
+      method,
+      tag,
+      exchangeRates,
+    };
+
+    dispatch(expenseAction(expensesObj));
+    console.log(expensesObj);
+    this.setState({
+      value: '',
+      description: '',
+      currency: 'USD',
+      method: 'Dinheiro',
+      tag: 'Alimentação',
+    });
   };
 
   render() {
@@ -89,9 +123,9 @@ class WalletForm extends Component {
               data-testid="method-input"
               onChange={ this.handleChange }
             >
-              <option value="dinheiro">Dinheiro</option>
-              <option value="credito">Cartão de crédito</option>
-              <option value="debito">Cartão de débito</option>
+              <option value="Dinheiro">Dinheiro</option>
+              <option value="Cartão de crédito">Cartão de crédito</option>
+              <option value="Cartão de débito">Cartão de débito</option>
             </select>
           </label>
           <br />
@@ -104,11 +138,11 @@ class WalletForm extends Component {
               data-testid="tag-input"
               onChange={ this.handleChange }
             >
-              <option value="alimentacao">Alimentação</option>
-              <option value="lazer">Lazer</option>
-              <option value="trabalho">Trabalho</option>
-              <option value="transporte">Transporte</option>
-              <option value="saude">Saúde</option>
+              <option value="Alimentação">Alimentação</option>
+              <option value="Lazer">Lazer</option>
+              <option value="Trabalho">Trabalho</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Saúde">Saúde</option>
             </select>
           </label>
 
@@ -138,10 +172,12 @@ class WalletForm extends Component {
 
 const mapStateToProps = (globalState) => ({
   currencies: globalState.wallet,
+  expenses: globalState.wallet.expenses,
 });
 
-WalletForm.propTypes = ({
-  dispatch: PropTypes.func.isRequired,
-});
+WalletForm.propTypes = {
+  dispatch: PropTypes.func,
+  expenses: PropTypes.arrayOf,
+}.isRequired;
 
 export default connect(mapStateToProps)(WalletForm);
