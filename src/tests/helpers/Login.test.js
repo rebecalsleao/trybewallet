@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import App from '../../App';
 import { renderWithRouterAndRedux } from './renderWith';
 
-describe('Cadastro de usuário', () => {
+describe('Testar o componente Login', () => {
   test('Se a tela é renderizada corretamente', () => {
     renderWithRouterAndRedux(<App />);
     const emailInput = screen.getByRole('textbox');

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import App from '../../App';
 import { renderWithRouterAndRedux } from './renderWith';
 
-describe('Cadastro de usuário', () => {
+describe('Testar componente Wallet', () => {
   test('Se ao fazer o login é redirecionado para a página Wallet', () => {
     renderWithRouterAndRedux(<App />);
     const emailOk = 'test@test.com';
