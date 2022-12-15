@@ -10,7 +10,7 @@ describe('Cadastro de usuário', () => {
     const emailOk = 'test@test.com';
     const passwordOk = '123456';
     const emailInput = screen.getByRole('textbox');
-    const passwordInput = screen.getByPlaceholderText(/password/i);
+    const passwordInput = screen.getByPlaceholderText(/senha/i);
     const button = screen.getByRole('button');
 
     userEvent.type(emailInput, emailOk);
@@ -40,18 +40,19 @@ describe('Cadastro de usuário', () => {
     const initialEntries = ['/carteira'];
     renderWithRouterAndRedux(<App />, { initialEntries });
 
+    const methodInput = screen.getByTestId('method-input');
     const valueInput = screen.getByTestId('value-input');
     const descriptionInput = screen.getByTestId('description-input');
     const currencyInput = await screen.getByTestId('currency-input');
-    const methodInput = screen.getByTestId('method-input');
     const tagInput = screen.getByTestId('tag-input');
     const cashOption = screen.getByRole('option', { name: 'Dinheiro' });
     const eatOption = screen.getByRole('option', { name: 'Alimentação' });
     const USDOption = await screen.findByRole('option', { name: 'USD' });
     const addExpenses = screen.getByRole('button', { name: /adicionar despesa/i });
+
+    userEvent.selectOptions(currencyInput, USDOption);
     userEvent.type(valueInput, '11');
     userEvent.type(descriptionInput, 'Onze dólares');
-    userEvent.selectOptions(currencyInput, USDOption);
     userEvent.selectOptions(methodInput, cashOption);
     userEvent.selectOptions(tagInput, eatOption);
     userEvent.click(addExpenses);
