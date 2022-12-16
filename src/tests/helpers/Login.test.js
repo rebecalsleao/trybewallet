@@ -4,6 +4,8 @@ import userEvent from '@testing-library/user-event';
 import App from '../../App';
 import { renderWithRouterAndRedux } from './renderWith';
 
+const EMAIL_TEST = 'teste@trybe.com.br';
+
 describe('Testar o componente Login', () => {
   test('Se a tela é renderizada corretamente', () => {
     renderWithRouterAndRedux(<App />);
@@ -13,6 +15,24 @@ describe('Testar o componente Login', () => {
     expect(emailInput).toBeInTheDocument();
     expect(passwordInput).toBeInTheDocument();
     expect(button).toBeInTheDocument();
+  });
+
+  test('Se o email digitado é válido.', () => {
+    renderWithRouterAndRedux(<App />);
+    userEvent.type(screen.getByRole('textbox'), EMAIL_TEST);
+    expect(screen.getByRole('button', { name: /entrar/i }).disabled).toBe(true);
+  });
+
+  test('Se o input do login possui data-testid com valor "email-input".', () => {
+    renderWithRouterAndRedux(<App />);
+    const idEmail = screen.getByTestId('email-input');
+    expect(idEmail).toBeInTheDocument();
+  });
+
+  test('Se o input da senha possui data-testid com valor "password-input".', () => {
+    renderWithRouterAndRedux(<App />);
+    const idPassword = screen.getByTestId('password-input');
+    expect(idPassword).toBeInTheDocument();
   });
 
   test('Se inicialmente o botão está desabilitado', () => {
